@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4B12478922CC9B1F005ECCD9 /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 4B12478822CC9B1F005ECCD9 /* Assets */; };
+		4B12478922CC9B1F005ECCD9 /* Models in Resources */ = {isa = PBXBuildFile; fileRef = 4B12478822CC9B1F005ECCD9 /* Models */; };
 		4B59150022CB47700088F552 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5914FF22CB47700088F552 /* AppDelegate.swift */; };
 		4B59150222CB47700088F552 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59150122CB47700088F552 /* ViewController.swift */; };
 		4B59150522CB47700088F552 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B59150322CB47700088F552 /* Main.storyboard */; };
@@ -17,7 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4B12478822CC9B1F005ECCD9 /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
+		4B12478822CC9B1F005ECCD9 /* Models */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Models; sourceTree = "<group>"; };
 		4B5914FC22CB47700088F552 /* ikea.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ikea.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B5914FF22CB47700088F552 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4B59150122CB47700088F552 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -58,7 +58,7 @@
 		4B5914FE22CB47700088F552 /* ikea */ = {
 			isa = PBXGroup;
 			children = (
-				4B12478822CC9B1F005ECCD9 /* Assets */,
+				4B12478822CC9B1F005ECCD9 /* Models */,
 				4B5914FF22CB47700088F552 /* AppDelegate.swift */,
 				4B59150122CB47700088F552 /* ViewController.swift */,
 				4B59150322CB47700088F552 /* Main.storyboard */,
@@ -129,7 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B59150A22CB47710088F552 /* LaunchScreen.storyboard in Resources */,
-				4B12478922CC9B1F005ECCD9 /* Assets in Resources */,
+				4B12478922CC9B1F005ECCD9 /* Models in Resources */,
 				4B59150722CB47710088F552 /* Assets.xcassets in Resources */,
 				4B59150522CB47700088F552 /* Main.storyboard in Resources */,
 			);
