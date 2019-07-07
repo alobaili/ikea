@@ -10,28 +10,41 @@ import UIKit
 import ARKit
 
 class ViewController: UIViewController {
+    override var prefersStatusBarHidden: Bool { return true }
+    @IBOutlet weak var planeDetectedLabel: UILabel!
     @IBOutlet weak var sceneView: ARSCNView!
     @IBOutlet weak var itemsCollectionView: UICollectionView!
     let itemsArray: [String] = ["cup", "vase", "boxing", "table"]
     var selectedItem: String?
-    
     let configuration  = ARWorldTrackingConfiguration()
+    var selectedNode: SCNNode? {
+        didSet {
+            print("new object selected")
+        }
+    }
+    var selectedAction: SCNAction?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configuration.planeDetection = .horizontal
-        sceneView.debugOptions = [.showWorldOrigin, .showFeaturePoints]
+//        sceneView.debugOptions = [.showWorldOrigin, .showFeaturePoints]
         sceneView.session.run(configuration)
-        sceneView.automaticallyUpdatesLighting = true
+        sceneView.autoenablesDefaultLighting = true
+        sceneView.delegate = self
         itemsCollectionView.dataSource = self
         itemsCollectionView.delegate = self
         registerGestureRecognizers()
     }
     
     func registerGestureRecognizers() {
-        
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
+        let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(pinch))
+        let rotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate))
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
         sceneView.addGestureRecognizer(tapGestureRecognizer)
+        sceneView.addGestureRecognizer(pinchGestureRecognizer)
+        sceneView.addGestureRecognizer(longPressGestureRecognizer)
+        sceneView.addGestureRecognizer(rotationGestureRecognizer)
     }
     
     @objc func tapped(sender: UITapGestureRecognizer) {
@@ -44,10 +57,62 @@ class ViewController: UIViewController {
         }
     }
     
+    @objc func pinch(sender: UIPinchGestureRecognizer) {
+        let sceneView = sender.view as! ARSCNView
+        let pinchLocation = sender.location(in: sceneView)
+        let hitTest = sceneView.hitTest(pinchLocation)
+        
+        if !hitTest.isEmpty {
+            let results = hitTest.first!
+            let node = results.node
+            let pinchAction = SCNAction.scale(by: sender.scale, duration: 0)
+            node.runAction(pinchAction)
+            sender.scale = 1
+        }
+    }
+    
+    @objc func rotate(sender: UIRotationGestureRecognizer) {
+        guard (selectedNode != nil) else { return }
+        if sender.state == .changed {
+            if sender.rotation < 0 { // clockwise
+                let rotationAcrion = SCNAction.rotate(by: sender.rotation * 0.15, around: SCNVector3(0, selectedNode!.position.y, 0), duration: 0)
+                selectedNode!.runAction(rotationAcrion)
+            } else { // counterclockwise
+                let rotationAcrion = SCNAction.rotate(by: sender.rotation * 0.15, around: SCNVector3(0, selectedNode!.position.y, 0), duration: 0)
+                selectedNode!.runAction(rotationAcrion)
+            }
+        }
+        if sender.state == .ended {
+            deselect(selectedNode!)
+        }
+    }
+    
+    @objc func longPress(sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            let sceneView = sender.view as! ARSCNView
+            let longPressLocation = sender.location(in: sceneView)
+            let hitTest = sceneView.hitTest(longPressLocation)
+            
+            if !hitTest.isEmpty {
+                let resultNode = hitTest.first!.node
+                if resultNode != selectedNode {
+                    selectedNode = resultNode
+                    sender.isEnabled = false
+                    selectedAction = SCNAction.moveBy(x: 0, y: 0.1, z: 0, duration: 0.1)
+                    selectedNode?.runAction(selectedAction!)
+                } else {
+                    print("node already selected")
+                }
+            }
+        } else {
+            sender.isEnabled = true
+        }
+    }
+    
     func addItem(hitTestResult: ARHitTestResult) {
         guard let selectedItem = selectedItem else { return }
         
-        let scene = SCNScene(named: "Models/\(selectedItem).scn")
+        let scene = SCNScene(named: "Models.scnassets/\(selectedItem).scn")
         let node  = scene?.rootNode.childNode(withName: selectedItem, recursively: false)
         let transform = hitTestResult.worldTransform
         // the position of a detected surface is stored in the third column
@@ -55,7 +120,11 @@ class ViewController: UIViewController {
         node?.position = SCNVector3(thirdColumn.x, thirdColumn.y, thirdColumn.z)
         sceneView.scene.rootNode.addChildNode(node!)
     }
-
+    
+    func deselect(_ node: SCNNode) {
+        selectedNode?.runAction(selectedAction!.reversed())
+        selectedNode = nil
+    }
 
 }
 
@@ -82,6 +151,18 @@ extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath)
         cell?.backgroundColor = UIColor(rgb: 0xFF9300)
+    }
+}
+
+extension ViewController: ARSCNViewDelegate {
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        guard anchor is ARPlaneAnchor else { return }
+        DispatchQueue.main.async {
+            self.planeDetectedLabel.isHidden = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self.planeDetectedLabel.isHidden = true
+            }
+        }
     }
 }
 
