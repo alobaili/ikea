@@ -22,7 +22,7 @@ class ViewController: UIViewController {
             print("new object selected")
         }
     }
-    var selectedAction: SCNAction?
+    let selectedAction: SCNAction = SCNAction.moveBy(x: 0, y: 0.1, z: 0, duration: 0.1)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,7 +83,7 @@ class ViewController: UIViewController {
             }
         }
         if sender.state == .ended {
-            deselect(selectedNode!)
+            deselectNode()
         }
     }
     
@@ -96,10 +96,10 @@ class ViewController: UIViewController {
             if !hitTest.isEmpty {
                 let resultNode = hitTest.first!.node
                 if resultNode != selectedNode {
+                    deselectNode()
                     selectedNode = resultNode
                     sender.isEnabled = false
-                    selectedAction = SCNAction.moveBy(x: 0, y: 0.1, z: 0, duration: 0.1)
-                    selectedNode?.runAction(selectedAction!)
+                    selectedNode?.runAction(selectedAction)
                 } else {
                     print("node already selected")
                 }
@@ -121,8 +121,8 @@ class ViewController: UIViewController {
         sceneView.scene.rootNode.addChildNode(node!)
     }
     
-    func deselect(_ node: SCNNode) {
-        selectedNode?.runAction(selectedAction!.reversed())
+    func deselectNode() {
+        selectedNode?.runAction(selectedAction.reversed())
         selectedNode = nil
     }
 
