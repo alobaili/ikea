@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var planeDetectedLabel: UILabel!
     @IBOutlet weak var sceneView: ARSCNView!
     @IBOutlet weak var itemsCollectionView: UICollectionView!
+    @IBOutlet weak var deleteButton: UIButton!
     let itemsArray: [String] = ["cup", "vase", "boxing", "table"]
     var selectedItem: String?
     let configuration  = ARWorldTrackingConfiguration()
@@ -82,9 +83,6 @@ class ViewController: UIViewController {
                 selectedNode!.runAction(rotationAcrion)
             }
         }
-        if sender.state == .ended {
-            deselectNode()
-        }
     }
     
     @objc func longPress(sender: UILongPressGestureRecognizer) {
@@ -100,8 +98,9 @@ class ViewController: UIViewController {
                     selectedNode = resultNode
                     sender.isEnabled = false
                     selectedNode?.runAction(selectedAction)
+                    deleteButton.isHidden = false
                 } else {
-                    print("node already selected")
+                    deselectNode()
                 }
             }
         } else {
@@ -121,9 +120,21 @@ class ViewController: UIViewController {
         sceneView.scene.rootNode.addChildNode(node!)
     }
     
+    @IBAction func deleteTapped(_ sender: Any) {
+        sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
+            if node == self.selectedNode {
+                node.removeFromParentNode()
+            }
+        }
+        selectedNode = nil
+        deleteButton.isHidden = true
+    }
+    
+    
     func deselectNode() {
         selectedNode?.runAction(selectedAction.reversed())
         selectedNode = nil
+        deleteButton.isHidden = true
     }
 
 }
