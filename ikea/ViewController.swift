@@ -23,7 +23,7 @@ class ViewController: UIViewController {
             print("new object selected")
         }
     }
-    let selectedAction: SCNAction = SCNAction.moveBy(x: 0, y: 0.1, z: 0, duration: 0.1)
+    let selectedAction: SCNAction = SCNAction.moveBy(x: 0, y: 0.05, z: 0, duration: 0.1)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,28 +59,21 @@ class ViewController: UIViewController {
     }
     
     @objc func pinch(sender: UIPinchGestureRecognizer) {
-        let sceneView = sender.view as! ARSCNView
-        let pinchLocation = sender.location(in: sceneView)
-        let hitTest = sceneView.hitTest(pinchLocation)
-        
-        if !hitTest.isEmpty {
-            let results = hitTest.first!
-            let node = results.node
-            let pinchAction = SCNAction.scale(by: sender.scale, duration: 0)
-            node.runAction(pinchAction)
-            sender.scale = 1
-        }
+        guard let selectedNode = selectedNode else { return }
+        let pinchAction = SCNAction.scale(by: sender.scale, duration: 0)
+        selectedNode.runAction(pinchAction)
+        sender.scale = 1
     }
     
     @objc func rotate(sender: UIRotationGestureRecognizer) {
-        guard (selectedNode != nil) else { return }
+        guard let selectedNode = selectedNode else { return }
         if sender.state == .changed {
             if sender.rotation < 0 { // clockwise
-                let rotationAcrion = SCNAction.rotate(by: sender.rotation * 0.15, around: SCNVector3(0, selectedNode!.position.y, 0), duration: 0)
-                selectedNode!.runAction(rotationAcrion)
+                let rotationAcrion = SCNAction.rotate(by: sender.rotation * 0.15, around: SCNVector3(0, selectedNode.position.y, 0), duration: 0)
+                selectedNode.runAction(rotationAcrion)
             } else { // counterclockwise
-                let rotationAcrion = SCNAction.rotate(by: sender.rotation * 0.15, around: SCNVector3(0, selectedNode!.position.y, 0), duration: 0)
-                selectedNode!.runAction(rotationAcrion)
+                let rotationAcrion = SCNAction.rotate(by: sender.rotation * 0.15, around: SCNVector3(0, selectedNode.position.y, 0), duration: 0)
+                selectedNode.runAction(rotationAcrion)
             }
         }
     }
