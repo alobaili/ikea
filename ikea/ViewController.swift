@@ -42,10 +42,13 @@ class ViewController: UIViewController {
         let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(pinch))
         let rotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate))
         let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+        let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(pan))
+        panGestureRecognizer.maximumNumberOfTouches = 1
         sceneView.addGestureRecognizer(tapGestureRecognizer)
         sceneView.addGestureRecognizer(pinchGestureRecognizer)
         sceneView.addGestureRecognizer(longPressGestureRecognizer)
         sceneView.addGestureRecognizer(rotationGestureRecognizer)
+        sceneView.addGestureRecognizer(panGestureRecognizer)
     }
     
     @objc func tapped(sender: UITapGestureRecognizer) {
@@ -74,6 +77,22 @@ class ViewController: UIViewController {
             } else { // counterclockwise
                 let rotationAcrion = SCNAction.rotate(by: sender.rotation * 0.15, around: SCNVector3(0, selectedNode.position.y, 0), duration: 0)
                 selectedNode.runAction(rotationAcrion)
+            }
+        }
+    }
+    
+    @objc func pan(sender: UIPanGestureRecognizer) {
+        if sender.state == .changed {
+            guard let selectedNode = selectedNode else { return }
+            let sceneView = sender.view as! ARSCNView
+            let panLocation = sender.location(in: sceneView)
+            let hitTest = sceneView.hitTest(panLocation, types: .existingPlaneUsingGeometry)
+            
+            if !hitTest.isEmpty {
+                let result = hitTest.first!
+                let thirdColumn = result.worldTransform.columns.3
+                let position = SCNVector3(thirdColumn.x, thirdColumn.y, thirdColumn.z)
+                selectedNode.position = position
             }
         }
     }
