@@ -92,8 +92,8 @@ class ViewController: UIViewController {
             if !hitTest.isEmpty {
                 let result = hitTest.first!
                 let thirdColumn = result.worldTransform.columns.3
-                let position = SCNVector3(thirdColumn.x, thirdColumn.y, thirdColumn.z)
-                selectedNode.position = position
+                let position = SCNVector3(thirdColumn.x, thirdColumn.y + 0.05, thirdColumn.z)
+                selectedNode.worldPosition = position
             }
         }
     }
