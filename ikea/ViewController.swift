@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var sceneView: ARSCNView!
     @IBOutlet weak var itemsCollectionView: UICollectionView!
     @IBOutlet weak var deleteButton: UIButton!
-    let itemsArray: [String] = ["cup", "vase", "boxing", "table", "teapot", "super-camputer"]
+    let itemsArray: [String] = ["cup", "vase", "boxing", "table", "teapot", "super-camputer", "cup_saucer_set"]
     var selectedItem: String?
     let configuration  = ARWorldTrackingConfiguration()
     var selectedNode: SCNNode? {
@@ -124,9 +124,9 @@ class ViewController: UIViewController {
     func addItem(hitTestResult: ARHitTestResult) {
         guard let selectedItem = selectedItem else { return }
         
-        if selectedItem == "super-camputer" {
+        if selectedItem == "super-camputer" || selectedItem == "cup_saucer_set" || selectedItem == "teapot" {
             let scene = SCNScene(named: "Models.scnassets/\(selectedItem).usdz")
-            let node  = scene?.rootNode
+            let node  = scene?.rootNode.flattenedClone()
             let transform = hitTestResult.worldTransform
             // the position of a detected surface is stored in the third column
             let thirdColumn = transform.columns.3
