@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var sceneView: ARSCNView!
     @IBOutlet weak var itemsCollectionView: UICollectionView!
     @IBOutlet weak var deleteButton: UIButton!
-    let itemsArray: [String] = ["cup", "vase", "boxing", "table"]
+    let itemsArray: [String] = ["cup", "vase", "boxing", "table", "teapot", "super-camputer"]
     var selectedItem: String?
     let configuration  = ARWorldTrackingConfiguration()
     var selectedNode: SCNNode? {
@@ -124,13 +124,23 @@ class ViewController: UIViewController {
     func addItem(hitTestResult: ARHitTestResult) {
         guard let selectedItem = selectedItem else { return }
         
-        let scene = SCNScene(named: "Models.scnassets/\(selectedItem).scn")
-        let node  = scene?.rootNode.childNode(withName: selectedItem, recursively: false)
-        let transform = hitTestResult.worldTransform
-        // the position of a detected surface is stored in the third column
-        let thirdColumn = transform.columns.3
-        node?.position = SCNVector3(thirdColumn.x, thirdColumn.y, thirdColumn.z)
-        sceneView.scene.rootNode.addChildNode(node!)
+        if selectedItem == "super-camputer" {
+            let scene = SCNScene(named: "Models.scnassets/\(selectedItem).usdz")
+            let node  = scene?.rootNode
+            let transform = hitTestResult.worldTransform
+            // the position of a detected surface is stored in the third column
+            let thirdColumn = transform.columns.3
+            node?.position = SCNVector3(thirdColumn.x, thirdColumn.y, thirdColumn.z)
+            sceneView.scene.rootNode.addChildNode(node!)
+        } else {
+            let scene = SCNScene(named: "Models.scnassets/\(selectedItem).scn")
+            let node  = scene?.rootNode.childNode(withName: selectedItem, recursively: false)
+            let transform = hitTestResult.worldTransform
+            // the position of a detected surface is stored in the third column
+            let thirdColumn = transform.columns.3
+            node?.position = SCNVector3(thirdColumn.x, thirdColumn.y, thirdColumn.z)
+            sceneView.scene.rootNode.addChildNode(node!)
+        }
     }
     
     @IBAction func deleteTapped(_ sender: Any) {
