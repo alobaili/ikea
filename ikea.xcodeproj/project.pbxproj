@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4B12478B22CDD281005ECCD9 /* Models.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B12478A22CDD281005ECCD9 /* Models.scnassets */; };
+		4B2E9673230C80E200EF3F75 /* CardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E9672230C80E200EF3F75 /* CardViewController.swift */; };
 		4B59150022CB47700088F552 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5914FF22CB47700088F552 /* AppDelegate.swift */; };
 		4B59150222CB47700088F552 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59150122CB47700088F552 /* ViewController.swift */; };
 		4B59150522CB47700088F552 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B59150322CB47700088F552 /* Main.storyboard */; };
@@ -17,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		4B12478A22CDD281005ECCD9 /* Models.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; name = Models.scnassets; path = ../Models.scnassets; sourceTree = "<group>"; };
+		4B2E9672230C80E200EF3F75 /* CardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewController.swift; sourceTree = "<group>"; };
 		4B5914FC22CB47700088F552 /* ikea.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ikea.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B5914FF22CB47700088F552 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4B59150122CB47700088F552 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 				4B59150822CB47710088F552 /* LaunchScreen.storyboard */,
 				4B59150B22CB47710088F552 /* Info.plist */,
 				4B59151122CC922F0088F552 /* ItemCollectionViewCell.swift */,
+				4B2E9672230C80E200EF3F75 /* CardViewController.swift */,
 			);
 			path = ikea;
 			sourceTree = "<group>";
@@ -138,6 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B2E9673230C80E200EF3F75 /* CardViewController.swift in Sources */,
 				4B59151222CC922F0088F552 /* ItemCollectionViewCell.swift in Sources */,
 				4B59150222CB47700088F552 /* ViewController.swift in Sources */,
 				4B59150022CB47700088F552 /* AppDelegate.swift in Sources */,
@@ -285,7 +289,6 @@
 		4B59150F22CB47710088F552 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = NCT5DLQUJC;
 				INFOPLIST_FILE = ikea/Info.plist;
@@ -303,7 +306,6 @@
 		4B59151022CB47710088F552 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = NCT5DLQUJC;
 				INFOPLIST_FILE = ikea/Info.plist;

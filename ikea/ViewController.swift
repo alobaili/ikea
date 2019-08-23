@@ -11,10 +11,30 @@ import ARKit
 
 class ViewController: UIViewController {
     override var prefersStatusBarHidden: Bool { return true }
+    
     @IBOutlet weak var planeDetectedLabel: UILabel!
     @IBOutlet weak var sceneView: ARSCNView!
-    @IBOutlet weak var itemsCollectionView: UICollectionView!
     @IBOutlet weak var deleteButton: UIButton!
+    
+    var cardViewController: CardViewController!
+    var visualEffectView: UIVisualEffectView!
+    
+    let cardHeight: CGFloat = 600
+    let cardHandleAreaHeight: CGFloat = 48
+    var isCardVisible = false
+    
+    enum CardState {
+        case explanded
+        case collapsed
+    }
+    
+    var nextState: CardState {
+        return isCardVisible ? .collapsed : .explanded
+    }
+    
+    var runningAnimations = [UIViewPropertyAnimator]()
+    var animationProgressWhenInterrupted: CGFloat = 0
+    
     let itemsArray: [String] = ["cup", "vase", "boxing", "table", "teapot", "super-camputer", "cup_saucer_set"]
     var selectedItem: String?
     let configuration  = ARWorldTrackingConfiguration()
@@ -27,14 +47,37 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupCard()
         configuration.planeDetection = .horizontal
 //        sceneView.debugOptions = [.showWorldOrigin, .showFeaturePoints]
         sceneView.session.run(configuration)
         sceneView.autoenablesDefaultLighting = true
         sceneView.delegate = self
-        itemsCollectionView.dataSource = self
-        itemsCollectionView.delegate = self
+        cardViewController.itemsCollectionView.dataSource = self
+        cardViewController.itemsCollectionView.delegate = self
         registerGestureRecognizers()
+    }
+    
+    func setupCard() {
+        visualEffectView = UIVisualEffectView()
+        visualEffectView.frame = view.frame
+        visualEffectView.isUserInteractionEnabled = false
+        view.addSubview(visualEffectView)
+        
+        cardViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "cardViewController") as? CardViewController
+        addChild(cardViewController)
+        view.addSubview(cardViewController.view)
+        
+        cardViewController.view.frame = CGRect(x: 0, y: view.frame.height - cardHandleAreaHeight, width: view.bounds.width, height: cardHeight)
+        
+        cardViewController.view.clipsToBounds = true
+        
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleCardTap(sender:)))
+        let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handleCardPan(sender:)))
+        
+        cardViewController.handleArea.addGestureRecognizer(tapGestureRecognizer)
+        cardViewController.handleArea.addGestureRecognizer(panGestureRecognizer)
+        
     }
     
     func registerGestureRecognizers() {
@@ -159,7 +202,99 @@ class ViewController: UIViewController {
         selectedNode = nil
         deleteButton.isHidden = true
     }
-
+    
+    @objc func handleCardTap(sender: UITapGestureRecognizer) {
+        switch sender.state {
+        case .ended:
+            animateTransitionIfNeeded(state: nextState, duration: 0.6)
+        default:
+            break
+        }
+    }
+    
+    @objc func handleCardPan(sender: UIPanGestureRecognizer) {
+        switch sender.state {
+        case .began:
+            startInteractiveTransition(state: nextState, duration: 0.6)
+        case .changed:
+            let translation = sender.translation(in: cardViewController.handleArea)
+            var fractionComplete = translation.y / cardHeight
+            fractionComplete = isCardVisible ? fractionComplete : -fractionComplete
+            updateInteractiveTransition(fractionCompleted: fractionComplete)
+        case .ended:
+            continueInteractiveTransition()
+        default:
+            break
+        }
+    }
+    
+    func animateTransitionIfNeeded(state: CardState, duration: TimeInterval) {
+        if runningAnimations.isEmpty {
+            let frameAnimator = UIViewPropertyAnimator(duration: duration, dampingRatio: 1) {
+                switch state {
+                case .explanded:
+                    self.cardViewController.view.frame.origin.y = self.view.frame.height - self.cardHeight
+                case .collapsed:
+                    self.cardViewController.view.frame.origin.y = self.view.frame.height - self.cardHandleAreaHeight
+                }
+            }
+            
+            frameAnimator.addCompletion { (_) in
+                self.isCardVisible = !self.isCardVisible
+                self.runningAnimations.removeAll()
+            }
+            
+            frameAnimator.startAnimation()
+            runningAnimations.append(frameAnimator)
+            
+            let cornerRadiousAnimator = UIViewPropertyAnimator(duration: duration, curve: .linear) {
+                switch state {
+                case .explanded:
+                    self.cardViewController.view.layer.cornerRadius = 12
+                case .collapsed:
+                    self.cardViewController.view.layer.cornerRadius = 0
+                }
+            }
+            
+            cornerRadiousAnimator.startAnimation()
+            runningAnimations.append(cornerRadiousAnimator)
+            
+            let blurAnimator = UIViewPropertyAnimator(duration: duration, dampingRatio: 1) {
+                switch state {
+                case .explanded:
+                    self.visualEffectView.effect = UIBlurEffect(style: .dark)
+                case .collapsed:
+                    self.visualEffectView.effect = nil
+                }
+            }
+            
+            blurAnimator.startAnimation()
+            runningAnimations.append(blurAnimator)
+        }
+    }
+    
+    func startInteractiveTransition(state: CardState, duration: TimeInterval) {
+        if runningAnimations.isEmpty {
+            animateTransitionIfNeeded(state: state, duration: duration)
+        }
+        
+        for animator in runningAnimations {
+            animator.pauseAnimation()
+            animationProgressWhenInterrupted = animator.fractionComplete
+        }
+    }
+    
+    func updateInteractiveTransition(fractionCompleted: CGFloat) {
+        for animator in runningAnimations {
+            animator.fractionComplete = fractionCompleted + animationProgressWhenInterrupted
+        }
+    }
+    
+    func continueInteractiveTransition() {
+        for animator in runningAnimations {
+            animator.continueAnimation(withTimingParameters: nil, durationFactor: 0)
+        }
+    }
 }
 
 extension ViewController: UICollectionViewDataSource {
